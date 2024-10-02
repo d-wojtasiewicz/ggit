@@ -1,6 +1,5 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2024 Dominik Wojtasiewicz dominikwojtasiewicz@gmail.com
 */
 package main
 
