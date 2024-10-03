@@ -4,6 +4,9 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+	"ggit/cmd/repoInit"
+	"ggit/internal/repository"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -28,5 +31,10 @@ func Execute() {
 }
 
 func init() {
-
+	r, err := repository.NewRepository()
+	if err != nil {
+		fmt.Printf("%e", err)
+		os.Exit(1)
+	}
+	rootCmd.AddCommand(repoInit.NewCommandInit(r))
 }
