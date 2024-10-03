@@ -18,23 +18,22 @@ func NewConfig(gitpath string) *config {
 	return &config{Path: filepath.Join(gitpath, ConfigName)}
 }
 
-func (c *config) Load() error {
+func (c *config) Load() {
 	data, err := ini.Load(c.Path)
 	if err != nil {
-		if err := filesystem.WriteToFile("", c.Path); err != nil {
-			return err
-		}
 		c.Data = ini.Empty()
-		return nil
 	}
 	c.Data = data
-	return nil
 }
 
 func (c *config) DefaultConfig() error {
-	if err := c.Load(); err != nil {
-		return err
+	if !filesystem.Exists(c.Path) {
+		if err := filesystem.WriteToFile("", c.Path); err != nil {
+			return err
+		}
 	}
+	c.Load()
+
 	core, err := c.Data.NewSection("core")
 	if err != nil {
 		return err

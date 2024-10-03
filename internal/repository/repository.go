@@ -27,6 +27,8 @@ func NewRepository() (*Repository, error) {
 	}
 	r.Worktree = cwd
 	r.Gitdir = filepath.Join(r.Worktree, gitdir)
+	r.Config = *NewConfig(r.Gitdir)
+	r.Config.Load()
 	return r, nil
 }
 
