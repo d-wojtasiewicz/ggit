@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"ggit/internal/factory"
 	"ggit/internal/filesystem"
 	"os"
 	"path/filepath"
@@ -17,6 +18,7 @@ type Repository struct {
 	Worktree string
 	Gitdir   string
 	Config   config
+	FS       factory.FS
 }
 
 // NewRepository creates and initializes a new repository instance.
@@ -31,7 +33,7 @@ type Repository struct {
 //   - An error if there was an issue retrieving the current working directory
 //     or loading the configuration. If no error occurs, the repository
 //     will be initialized with its worktree and Git directory set properly.
-func NewRepository() (*Repository, error) {
+func NewRepository(fs factory.FS) (*Repository, error) {
 	r := &Repository{}
 	cwd, err := filesystem.GetCWD()
 	if err != nil {
@@ -39,7 +41,7 @@ func NewRepository() (*Repository, error) {
 	}
 	r.Worktree = cwd
 	r.Gitdir = filepath.Join(r.Worktree, gitdir)
-	r.Config = *NewConfig(r.Gitdir)
+	r.Config = *NewConfig(r.Gitdir, fs)
 	r.Config.Load()
 	return r, nil
 }
@@ -82,8 +84,8 @@ func (r *Repository) path(path ...string) string {
 //     where a directory is expected.
 func (r *Repository) MakeDir(path ...string) (string, error) {
 	repoPath := r.path(path...)
-	if filesystem.Exists(repoPath) {
-		if !filesystem.IsDir(repoPath) {
+	if filesystem.Exists(r.FS, repoPath) {
+		if !filesystem.IsDir(r.FS, repoPath) {
 			return repoPath, filesystem.ErrIsFileError
 		}
 		return repoPath, nil
@@ -100,7 +102,7 @@ func (r *Repository) MakeDir(path ...string) (string, error) {
 //   - An error if writing to the file fails.
 func (r *Repository) WriteToFile(data string, path ...string) error {
 	r.MakeDir(path[0 : len(path)-1]...)
-	return filesystem.WriteToFile(data, r.path(path...))
+	return filesystem.WriteToFile(r.FS, data, r.path(path...))
 }
 
 // Exists checks if the repository's worktree directory is empty.
@@ -119,7 +121,7 @@ func (r *Repository) Exists() (bool, error) {
 //   - Boolean true if the file already exists, false otherwise.
 //   - An error if writing to the file fails.
 func (r *Repository) defaultFile(path string, data string) (bool, error) {
-	if !filesystem.Exists(r.path(path)) {
+	if !filesystem.Exists(r.FS, r.path(path)) {
 		err := r.WriteToFile(data, path)
 		if err != nil {
 			return false, err
@@ -191,7 +193,7 @@ func (r *Repository) Create() error {
 		msg = reinitMsg
 	}
 
-	c := NewConfig(r.Gitdir)
+	c := NewConfig(r.Gitdir, r.FS)
 	if err := c.DefaultConfig(); err != nil {
 		return err
 	}

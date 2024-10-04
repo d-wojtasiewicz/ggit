@@ -4,6 +4,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/afero"
 )
 
 // GetCWD returns the current working directory of the calling process.
@@ -52,8 +54,8 @@ func EmptyDir(dir string) (bool, error) {
 //
 // Returns:
 //   - A boolean indicating whether the specified path exists.
-func Exists(path string) bool {
-	_, err := os.Stat(path)
+func Exists(fs afero.Fs, path string) bool {
+	_, err := fs.Stat(path)
 	return err == nil
 }
 
@@ -64,19 +66,10 @@ func Exists(path string) bool {
 //
 // Returns:
 //   - A boolean indicating whether the specified path is a directory.
-func IsDir(dir string) bool {
-	if !Exists(dir) {
+func IsDir(fs afero.Fs, dir string) bool {
+	if !Exists(fs, dir) {
 		return false
 	}
-	fileInfo, _ := os.Stat(dir)
+	fileInfo, _ := fs.Stat(dir)
 	return fileInfo.IsDir()
-}
-
-// IsFile checks if a specified path is a file by using the IsDir function.
-// It returns true if the path is not a directory, and false if it is.
-//
-// Returns:
-//   - A boolean indicating whether the specified path is a file.
-func IsFile(path string) bool {
-	return !IsDir(path)
 }

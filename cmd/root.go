@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"ggit/cmd/repoInit"
+	"ggit/internal/factory"
 	"ggit/internal/repository"
 	"os"
 
@@ -31,7 +32,8 @@ func Execute() {
 }
 
 func init() {
-	r, err := repository.NewRepository()
+	fs := factory.NewFactory()
+	r, err := repository.NewRepository(fs)
 	if err != nil {
 		fmt.Printf("%e", err)
 		os.Exit(1)

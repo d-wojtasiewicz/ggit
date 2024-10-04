@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"ggit/internal/factory"
 	"os"
 	"path/filepath"
 )
@@ -18,9 +19,9 @@ import (
 //
 // Returns:
 //   - An error if there is an issue opening the file, writing the data, or syncing the file.
-func WriteToFile(data string, path ...string) error {
+func WriteToFile(fs factory.FS, data string, path ...string) error {
 	file_path := filepath.Join(path...)
-	f, err := os.OpenFile(file_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := fs.OpenFile(file_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -31,4 +32,13 @@ func WriteToFile(data string, path ...string) error {
 	}
 	f.Sync()
 	return nil
+}
+
+// IsFile checks if a specified path is a file by using the IsDir function.
+// It returns true if the path is not a directory, and false if it is.
+//
+// Returns:
+//   - A boolean indicating whether the specified path is a file.
+func IsFile(fs factory.FS, path string) bool {
+	return !IsDir(fs, path)
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"ggit/internal/factory"
 	"ggit/internal/filesystem"
 	"path/filepath"
 
@@ -12,10 +13,11 @@ const ConfigName = "config"
 type config struct {
 	Path string
 	Data *ini.File
+	FS   factory.FS
 }
 
-func NewConfig(gitpath string) *config {
-	return &config{Path: filepath.Join(gitpath, ConfigName)}
+func NewConfig(gitpath string, fs factory.FS) *config {
+	return &config{Path: filepath.Join(gitpath, ConfigName), FS: fs}
 }
 
 // Load loads the configuration data from the path specified in config struct.
@@ -48,8 +50,8 @@ func (c *config) Empty() bool {
 // Finally, it saves the updated configuration back to the file.
 // Returns an error if any operation (file check, write, load, or save) fails.
 func (c *config) DefaultConfig() error {
-	if !filesystem.Exists(c.Path) {
-		if err := filesystem.WriteToFile("", c.Path); err != nil {
+	if !filesystem.Exists(c.FS, c.Path) {
+		if err := filesystem.WriteToFile(c.FS, "", c.Path); err != nil {
 			return err
 		}
 	}
