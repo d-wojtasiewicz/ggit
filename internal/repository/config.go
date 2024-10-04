@@ -18,6 +18,8 @@ func NewConfig(gitpath string) *config {
 	return &config{Path: filepath.Join(gitpath, ConfigName)}
 }
 
+// Load loads the configuration data from the path specified in config struct.
+// If an error occurs during loading, it initializes the config data to an empty state.
 func (c *config) Load() {
 	data, err := ini.Load(c.Path)
 	if err != nil {
@@ -26,6 +28,25 @@ func (c *config) Load() {
 	c.Data = data
 }
 
+// Empty checks whether the configuration data is empty.
+// It returns true if there are no sections in the configuration data,
+// indicating that the config is uninitialized or has no settings.
+// Otherwise, it returns false.
+func (c *config) Empty() bool {
+	return len(c.Data.Sections()) == 0
+}
+
+// DefaultConfig initializes the configuration with default values if the
+// configuration file does not exist at the specified path (c.Path).
+// If the file is missing, it creates a new file with an empty initial content.
+// After ensuring the file exists, it loads the configuration data.
+// It then creates a new section named "core" and adds three default keys:
+//   - "repositoryformatversion" with a value of "0"
+//   - "filemode" with a value of "false"
+//   - "bare" with a value of "false"
+//
+// Finally, it saves the updated configuration back to the file.
+// Returns an error if any operation (file check, write, load, or save) fails.
 func (c *config) DefaultConfig() error {
 	if !filesystem.Exists(c.Path) {
 		if err := filesystem.WriteToFile("", c.Path); err != nil {
