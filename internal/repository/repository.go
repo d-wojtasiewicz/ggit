@@ -33,12 +33,8 @@ type Repository struct {
 //   - An error if there was an issue retrieving the current working directory
 //     or loading the configuration. If no error occurs, the repository
 //     will be initialized with its worktree and Git directory set properly.
-func NewRepository(fs factory.FS) (*Repository, error) {
+func NewRepository(fs factory.FS, cwd string) (*Repository, error) {
 	r := &Repository{}
-	cwd, err := filesystem.GetCWD()
-	if err != nil {
-		return r, err
-	}
 	r.Worktree = cwd
 	r.Gitdir = filepath.Join(r.Worktree, gitdir)
 	r.Config = *NewConfig(r.Gitdir, fs)

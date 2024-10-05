@@ -1,11 +1,10 @@
 package filesystem
 
 import (
+	"ggit/internal/factory"
 	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/spf13/afero"
 )
 
 // GetCWD returns the current working directory of the calling process.
@@ -54,7 +53,7 @@ func EmptyDir(dir string) (bool, error) {
 //
 // Returns:
 //   - A boolean indicating whether the specified path exists.
-func Exists(fs afero.Fs, path string) bool {
+func Exists(fs factory.FS, path string) bool {
 	_, err := fs.Stat(path)
 	return err == nil
 }
@@ -66,7 +65,7 @@ func Exists(fs afero.Fs, path string) bool {
 //
 // Returns:
 //   - A boolean indicating whether the specified path is a directory.
-func IsDir(fs afero.Fs, dir string) bool {
+func IsDir(fs factory.FS, dir string) bool {
 	if !Exists(fs, dir) {
 		return false
 	}

@@ -14,10 +14,11 @@ type config struct {
 	Path string
 	Data *ini.File
 	FS   factory.FS
+	Save bool
 }
 
 func NewConfig(gitpath string, fs factory.FS) *config {
-	return &config{Path: filepath.Join(gitpath, ConfigName), FS: fs}
+	return &config{Path: filepath.Join(gitpath, ConfigName), FS: fs, Save: true}
 }
 
 // Load loads the configuration data from the path specified in config struct.
@@ -26,6 +27,7 @@ func (c *config) Load() {
 	data, err := ini.Load(c.Path)
 	if err != nil {
 		c.Data = ini.Empty()
+		return
 	}
 	c.Data = data
 }
@@ -75,8 +77,11 @@ func (c *config) DefaultConfig() error {
 	if err != nil {
 		return err
 	}
-	if err = c.Data.SaveTo(c.Path); err != nil {
-		return err
+
+	if c.Save {
+		if err = c.Data.SaveTo(c.Path); err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"ggit/cmd/repoInit"
 	"ggit/internal/factory"
+	"ggit/internal/filesystem"
 	"ggit/internal/repository"
 	"os"
 
@@ -33,7 +34,12 @@ func Execute() {
 
 func init() {
 	fs := factory.NewFactory()
-	r, err := repository.NewRepository(fs)
+	cwd, err := filesystem.GetCWD()
+	if err != nil {
+		fmt.Printf("%e", err)
+		os.Exit(1)
+	}
+	r, err := repository.NewRepository(fs, cwd)
 	if err != nil {
 		fmt.Printf("%e", err)
 		os.Exit(1)
