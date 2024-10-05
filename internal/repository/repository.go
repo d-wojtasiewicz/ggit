@@ -37,7 +37,8 @@ func NewRepository(fs factory.FS, cwd string) (*Repository, error) {
 	r := &Repository{}
 	r.Worktree = cwd
 	r.Gitdir = filepath.Join(r.Worktree, gitdir)
-	r.Config = *NewConfig(r.Gitdir, fs)
+	r.FS = fs
+	r.Config = *NewConfig(r.Gitdir, r.FS)
 	r.Config.Load()
 	return r, nil
 }
@@ -86,7 +87,7 @@ func (r *Repository) MakeDir(path ...string) (string, error) {
 		}
 		return repoPath, nil
 	}
-	return repoPath, os.MkdirAll(repoPath, os.ModePerm)
+	return repoPath, r.FS.MkdirAll(repoPath, os.ModePerm)
 }
 
 // WriteToFile writes the specified data to a file at the given path,
@@ -99,15 +100,6 @@ func (r *Repository) MakeDir(path ...string) (string, error) {
 func (r *Repository) WriteToFile(data string, path ...string) error {
 	r.MakeDir(path[0 : len(path)-1]...)
 	return filesystem.WriteToFile(r.FS, data, r.path(path...))
-}
-
-// Exists checks if the repository's worktree directory is empty.
-//
-// Returns
-//   - A boolean indicating whether the worktree is empty
-//   - An error if there was an issue checking the directory.
-func (r *Repository) Exists() (bool, error) {
-	return filesystem.EmptyDir(r.Worktree)
 }
 
 // defaultFile checks if a file exists at the specified path in the repository.
