@@ -53,7 +53,7 @@ func (c *config) Empty() bool {
 // Returns an error if any operation (file check, write, load, or save) fails.
 func (c *config) DefaultConfig() error {
 	if !filesystem.Exists(c.FS, c.Path) {
-		if err := filesystem.WriteToFile(c.FS, "", c.Path); err != nil {
+		if err := filesystem.WriteStringToFile(c.FS, "", c.Path); err != nil {
 			return err
 		}
 	}

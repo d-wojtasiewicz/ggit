@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"ggit/internal/factory"
 	"ggit/internal/filesystem"
+	"ggit/internal/objects"
+	"ggit/internal/util"
 	"os"
 	"path/filepath"
 )
@@ -90,16 +92,30 @@ func (r *Repository) MakeDir(path ...string) (string, error) {
 	return repoPath, r.FS.MkdirAll(repoPath, os.ModePerm)
 }
 
-// WriteToFile writes the specified data to a file at the given path,
+// WriteTextToFile writes the specified data to a file at the given path,
 // which is relative to the repository's Git directory. The method ensures
-// that the necessary directory structure exists by calling MakeDir for all
-// but the last path component.
+// that the necessary directory structure exists.
 //
 // Returns:
 //   - An error if writing to the file fails.
-func (r *Repository) WriteToFile(data string, path ...string) error {
+func (r *Repository) WriteTextToFile(data string, path ...string) error {
 	r.MakeDir(path[0 : len(path)-1]...)
-	return filesystem.WriteToFile(r.FS, data, r.path(path...))
+	return filesystem.WriteStringToFile(r.FS, data, r.path(path...))
+}
+
+// WriteBytesToFile compresses they byte data and writes the specified data
+// to a file at the given path, which is relative to the repository's Git directory.
+// The method ensures that the necessary directory structure exists.
+//
+// Returns:
+//   - An error if writing to the file fails.
+func (r *Repository) WriteBytesToFile(data []byte, path ...string) error {
+	r.MakeDir(path[0 : len(path)-1]...)
+	compressed, err := util.Compress(data)
+	if err != nil {
+		return err
+	}
+	return filesystem.WriteBytesToFile(r.FS, compressed, r.path(path...))
 }
 
 // defaultFile checks if a file exists at the specified path in the repository.
@@ -110,7 +126,7 @@ func (r *Repository) WriteToFile(data string, path ...string) error {
 //   - An error if writing to the file fails.
 func (r *Repository) defaultFile(path string, data string) (bool, error) {
 	if !filesystem.Exists(r.FS, r.path(path)) {
-		err := r.WriteToFile(data, path)
+		err := r.WriteTextToFile(data, path)
 		if err != nil {
 			return false, err
 		}
@@ -187,4 +203,10 @@ func (r *Repository) Create() error {
 	}
 	fmt.Println(msg)
 	return nil
+}
+
+func (r *Repository) WriteObject(o objects.GitObject) error {
+	sha := o.Hash()
+	path := r.path(sha[0:2], sha[2:])
+	return r.WriteBytesToFile([]byte(sha), path)
 }
