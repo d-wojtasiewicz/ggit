@@ -7,12 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestObjectSerialize(t *testing.T) {
-	o := objects.Object{}
-	assert.Panics(t, func() { o.Serialize() })
+func TestDefaultObject(t *testing.T) {
+	b := objects.NewBlob([]byte{})
+	assert.Equal(t, b.Format, []byte(blobType))
+	assert.Equal(t, b.Serialize(), []byte{})
 }
 
-func TestObjectDeserialize(t *testing.T) {
-	o := objects.Object{}
-	assert.Panics(t, func() { o.Deserialize("test_value") })
+func TestCustomtObject(t *testing.T) {
+	data := "HelloThisIsATest"
+	b := objects.NewBlob([]byte(data))
+	assert.Equal(t, b.Serialize(), []byte(data))
 }

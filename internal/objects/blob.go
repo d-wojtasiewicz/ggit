@@ -1,22 +1,12 @@
 package objects
 
 type Blob struct {
-	Object
+	object
 }
 
-func NewBlob(data string) *Blob {
-	if data == "" {
-		data = "blob"
-	}
+func NewBlob(data []byte) *Blob {
 	b := Blob{}
+	b.format = []byte("blob")
 	b.Deserialize(data)
 	return &b
-}
-
-func (b *Blob) Serialize() []byte {
-	return b.data
-}
-
-func (b *Blob) Deserialize(data string) {
-	b.data = []byte(data)
 }
