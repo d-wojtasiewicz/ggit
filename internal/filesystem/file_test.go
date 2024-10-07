@@ -44,7 +44,7 @@ func TestWriteToFile(t *testing.T) {
 	tests[0] = fileWriteTest{Path: []string{"test", "file.go"}, Text: "Hello this is a test"}
 	tests[1] = fileWriteTest{Path: []string{"file2.go"}, Text: "Hello this is also a test"}
 	for _, test := range tests {
-		err := filesystem.WriteToFile(fs, test.Text, test.Path...)
+		err := filesystem.WriteStringToFile(fs, test.Text, test.Path...)
 		assert.NoError(t, err, "Expected no error when writing to file")
 
 		contents, err := afero.ReadFile(fs, filepath.Join(test.Path...))
