@@ -1,5 +1,10 @@
 package objects
 
+type GitObject interface {
+	Serialize() []byte
+	Deserialize(data string)
+}
+
 type Object struct {
 	data []byte
 }
