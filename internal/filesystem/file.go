@@ -1,6 +1,8 @@
 package filesystem
 
 import (
+	"bytes"
+	"fmt"
 	"ggit/internal/factory"
 	"os"
 	"path/filepath"
@@ -56,4 +58,18 @@ func WriteBytesToFile(fs factory.FS, data []byte, path ...string) error {
 //   - A boolean indicating whether the specified path is a file.
 func IsFile(fs factory.FS, path string) bool {
 	return !IsDir(fs, path)
+}
+
+func ReadFileData(fs factory.FS, path ...string) ([]byte, error) {
+	filepath := filepath.Join(path...)
+	if !Exists(fs, filepath) {
+		return nil, fmt.Errorf("file not found")
+	}
+	buf := bytes.NewBuffer(nil)
+	f, _ := fs.Open(filepath)
+	_, err := f.Read(buf.Bytes())
+	if err != nil {
+		return buf.Bytes(), err
+	}
+	return buf.Bytes(), nil
 }
