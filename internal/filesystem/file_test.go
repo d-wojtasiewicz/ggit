@@ -21,15 +21,17 @@ func TestIsFile(t *testing.T) {
 	tests[3] = fileTest{Path: "./test/file3.go", Result: true}
 
 	for _, test := range tests {
-		if test.Result {
-			fs.MkdirAll(test.Path, os.ModePerm)
-		} else {
-			fs.Create(test.Path)
-		}
-		isDir := filesystem.IsDir(fs, test.Path)
-		if isDir != test.Result {
-			t.Fatalf("path %s dosen't match expected state: %v result: %v", test.Path, isDir, test.Result)
-		}
+		t.Run(test.Path, func(t *testing.T) {
+			if test.Result {
+				fs.MkdirAll(test.Path, os.ModePerm)
+			} else {
+				fs.Create(test.Path)
+			}
+			isDir := filesystem.IsDir(fs, test.Path)
+			if isDir != test.Result {
+				t.Fatalf("path %s dosen't match expected state: %v result: %v", test.Path, isDir, test.Result)
+			}
+		})
 	}
 }
 
@@ -44,11 +46,14 @@ func TestWriteToFile(t *testing.T) {
 	tests[0] = fileWriteTest{Path: []string{"test", "file.go"}, Text: "Hello this is a test"}
 	tests[1] = fileWriteTest{Path: []string{"file2.go"}, Text: "Hello this is also a test"}
 	for _, test := range tests {
-		err := filesystem.WriteStringToFile(fs, test.Text, test.Path...)
-		assert.NoError(t, err, "Expected no error when writing to file")
+		name := filepath.Join(test.Path...)
+		t.Run(name, func(t *testing.T) {
+			err := filesystem.WriteStringToFile(fs, test.Text, test.Path...)
+			assert.NoError(t, err, "Expected no error when writing to file")
 
-		contents, err := afero.ReadFile(fs, filepath.Join(test.Path...))
-		assert.NoError(t, err, "Error while reading file")
-		assert.Equal(t, string(contents), test.Text)
+			contents, err := afero.ReadFile(fs, filepath.Join(test.Path...))
+			assert.NoError(t, err, "Error while reading file")
+			assert.Equal(t, string(contents), test.Text)
+		})
 	}
 }

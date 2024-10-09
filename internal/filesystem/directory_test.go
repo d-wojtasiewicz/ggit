@@ -24,11 +24,13 @@ func TestExists(t *testing.T) {
 	tests[3] = fileTest{Path: "./file3.go", Result: false}
 
 	for _, test := range tests {
-		if test.Result {
-			fs.Create(test.Path)
-		}
-		exists := filesystem.Exists(fs, test.Path)
-		assert.Equal(t, exists, test.Result)
+		t.Run(test.Path, func(t *testing.T) {
+			if test.Result {
+				fs.Create(test.Path)
+			}
+			exists := filesystem.Exists(fs, test.Path)
+			assert.Equal(t, exists, test.Result)
+		})
 	}
 }
 
@@ -42,12 +44,14 @@ func TestIsDir(t *testing.T) {
 	tests[3] = fileTest{Path: "./test/file3.go", Result: false}
 
 	for _, test := range tests {
-		if test.Result {
-			fs.MkdirAll(test.Path, os.ModePerm)
-		} else {
-			fs.Create(test.Path)
-		}
-		isDir := filesystem.IsDir(fs, test.Path)
-		assert.Equal(t, isDir, test.Result)
+		t.Run(test.Path, func(t *testing.T) {
+			if test.Result {
+				fs.MkdirAll(test.Path, os.ModePerm)
+			} else {
+				fs.Create(test.Path)
+			}
+			isDir := filesystem.IsDir(fs, test.Path)
+			assert.Equal(t, isDir, test.Result)
+		})
 	}
 }

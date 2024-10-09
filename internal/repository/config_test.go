@@ -11,35 +11,37 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	fs := factory.NewTestFactory()
-	c := repository.NewConfig("./", fs)
-	c.Save = false
+	t.Run("CreateConfig", func(t *testing.T) {
+		fs := factory.NewTestFactory()
+		c := repository.NewConfig("./", fs)
+		c.Save = false
 
-	err := c.DefaultConfig()
-	assert.NoError(t, err, "Error creating default config")
+		err := c.DefaultConfig()
+		assert.NoError(t, err, "Error creating default config")
 
-	exists, err := afero.Exists(fs, c.Path)
-	assert.NoError(t, err, "Config file not created")
-	assert.True(t, exists, "Config file not found")
-	section, err := c.Data.GetSection("core")
-	assert.NoError(t, err, "Config file dosen't contain default seciton")
+		exists, err := afero.Exists(fs, c.Path)
+		assert.NoError(t, err, "Config file not created")
+		assert.True(t, exists, "Config file not found")
+		section, err := c.Data.GetSection("core")
+		assert.NoError(t, err, "Config file dosen't contain default seciton")
 
-	type ketTest struct {
-		Key   string
-		Value string
-	}
+		type ketTest struct {
+			Key   string
+			Value string
+		}
 
-	tests := make([]ketTest, 3)
-	tests[0] = ketTest{Key: "repositoryformatversion", Value: "0"}
-	tests[1] = ketTest{Key: "filemode", Value: "false"}
-	tests[2] = ketTest{Key: "bare", Value: "false"}
+		tests := make([]ketTest, 3)
+		tests[0] = ketTest{Key: "repositoryformatversion", Value: "0"}
+		tests[1] = ketTest{Key: "filemode", Value: "false"}
+		tests[2] = ketTest{Key: "bare", Value: "false"}
 
-	for _, test := range tests {
-		key, err := section.GetKey(test.Key)
-		assert.NoError(t, err, fmt.Sprintf("failed to retrive key: %s", test.Key))
-		assert.Equal(t, key.String(), test.Value)
-	}
+		for _, test := range tests {
+			key, err := section.GetKey(test.Key)
+			assert.NoError(t, err, fmt.Sprintf("failed to retrive key: %s", test.Key))
+			assert.Equal(t, key.String(), test.Value)
+		}
 
-	_, err = afero.ReadFile(fs, c.Path)
-	assert.NoError(t, err)
+		_, err = afero.ReadFile(fs, c.Path)
+		assert.NoError(t, err)
+	})
 }

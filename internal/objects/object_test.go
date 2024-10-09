@@ -8,13 +8,17 @@ import (
 )
 
 func TestDefaultObject(t *testing.T) {
-	b := objects.NewBlob([]byte{})
-	assert.Equal(t, b.Format, []byte(blobType))
-	assert.Equal(t, b.Serialize(), []byte{})
+	t.Run("DefaultObject", func(t *testing.T) {
+		b := objects.NewBlob([]byte{})
+		assert.Equal(t, b.Format(), []byte(blobType))
+		assert.Equal(t, b.Serialize(), []byte{})
+	})
 }
 
 func TestCustomtObject(t *testing.T) {
-	data := "HelloThisIsATest"
-	b := objects.NewBlob([]byte(data))
-	assert.Equal(t, b.Serialize(), []byte(data))
+	t.Run("DataObject", func(t *testing.T) {
+		data := "HelloThisIsATest"
+		b := objects.NewBlob([]byte(data))
+		assert.Equal(t, b.Serialize(), []byte(data))
+	})
 }
