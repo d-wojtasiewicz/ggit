@@ -8,6 +8,8 @@ import (
 	"ggit/internal/util"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -206,7 +208,49 @@ func (r *Repository) Create() error {
 }
 
 func (r *Repository) WriteObject(o objects.GitObject) error {
-	sha := o.Hash()
+	sha, err := o.Hash()
+	if err != nil {
+		return err
+	}
 	path := r.path(sha[0:2], sha[2:])
 	return r.WriteBytesToFile([]byte(sha), path)
+}
+
+func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
+	path := r.path("objects", sha[0:2], sha[2:])
+	if !filesystem.Exists(r.FS, path) {
+		return nil, fmt.Errorf("object not found")
+	}
+
+	data, err := filesystem.ReadFileData(r.FS, path)
+	if err != nil {
+		return nil, err
+	}
+
+	decompressedData, err := util.Decompress(data)
+	if err != nil {
+		return nil, err
+	}
+
+	str := string(decompressedData)
+
+	x := strings.Index(str, " ")
+	format := str[0:x]
+
+	y := strings.Index(str, "\x00")
+	size, err := strconv.Atoi(str[x:y])
+	if err != nil {
+		return nil, fmt.Errorf("unable to read object size")
+	}
+
+	if size != len(decompressedData)-y-1 {
+		return nil, fmt.Errorf("malformed object %s: bad length", sha)
+	}
+
+	switch format {
+	case "blob":
+		return objects.NewBlob([]byte(decompressedData[y+1:])), nil
+	default:
+		return nil, fmt.Errorf("unknown type %s for object %s", format, sha)
+	}
 }
