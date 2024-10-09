@@ -8,9 +8,9 @@ import (
 
 type GitObject interface {
 	Serialize() []byte
-	Deserialize(data string)
+	Deserialize(data []byte)
 	Format() []byte
-	Hash() string
+	Hash() (string, error)
 }
 
 type object struct {
