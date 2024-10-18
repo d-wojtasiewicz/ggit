@@ -6,32 +6,32 @@ import (
 	"io"
 )
 
-func Compress(data []byte) ([]byte, error) {
+func Compress(data string) (string, error) {
 	var buffer bytes.Buffer
 	writer := zlib.NewWriter(&buffer)
-	_, err := writer.Write(data)
+	_, err := writer.Write([]byte(data))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	err = writer.Close()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return buffer.Bytes(), nil
+	return buffer.String(), nil
 }
 
-func Decompress(data []byte) ([]byte, error) {
-	reader, err := zlib.NewReader(bytes.NewReader(data))
+func Decompress(data string) (string, error) {
+	reader, err := zlib.NewReader(bytes.NewReader([]byte(data)))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer reader.Close()
 
 	var buffer bytes.Buffer
 	_, err = io.Copy(&buffer, reader)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return buffer.Bytes(), nil
+	return buffer.String(), nil
 }
