@@ -60,16 +60,16 @@ func IsFile(fs factory.FS, path string) bool {
 	return !IsDir(fs, path)
 }
 
-func ReadFileData(fs factory.FS, path ...string) ([]byte, error) {
+func ReadFileData(fs factory.FS, path ...string) (string, error) {
 	filepath := filepath.Join(path...)
 	if !Exists(fs, filepath) {
-		return nil, fmt.Errorf("file not found")
+		return "", fmt.Errorf("file not found")
 	}
 	buf := bytes.NewBuffer(nil)
 	f, _ := fs.Open(filepath)
 	_, err := f.Read(buf.Bytes())
 	if err != nil {
-		return buf.Bytes(), err
+		return "", err
 	}
-	return buf.Bytes(), nil
+	return buf.String(), nil
 }

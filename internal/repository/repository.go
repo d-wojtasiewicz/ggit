@@ -111,13 +111,13 @@ func (r *Repository) WriteTextToFile(data string, path ...string) error {
 //
 // Returns:
 //   - An error if writing to the file fails.
-func (r *Repository) WriteBytesToFile(data []byte, path ...string) error {
+func (r *Repository) WriteBytesToFile(data string, path ...string) error {
 	r.MakeDir(path[0 : len(path)-1]...)
 	compressed, err := util.Compress(data)
 	if err != nil {
 		return err
 	}
-	return filesystem.WriteBytesToFile(r.FS, compressed, r.path(path...))
+	return filesystem.WriteStringToFile(r.FS, compressed, r.path(path...))
 }
 
 // defaultFile checks if a file exists at the specified path in the repository.
@@ -208,12 +208,9 @@ func (r *Repository) Create() error {
 }
 
 func (r *Repository) WriteObject(o objects.GitObject) error {
-	sha, err := o.Hash()
-	if err != nil {
-		return err
-	}
-	path := r.path(sha[0:2], sha[2:])
-	return r.WriteBytesToFile([]byte(sha), path)
+	data := o.Serialize()
+	path := r.path(data[0:2], data[2:])
+	return r.WriteBytesToFile(data, path)
 }
 
 func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
@@ -249,7 +246,7 @@ func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
 
 	switch format {
 	case "blob":
-		return objects.NewBlob([]byte(decompressedData[y+1:])), nil
+		return objects.NewBlob(str[y+1:]), nil
 	default:
 		return nil, fmt.Errorf("unknown type %s for object %s", format, sha)
 	}

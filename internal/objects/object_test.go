@@ -9,16 +9,42 @@ import (
 
 func TestDefaultObject(t *testing.T) {
 	t.Run("DefaultObject", func(t *testing.T) {
-		b := objects.NewBlob([]byte{})
-		assert.Equal(t, b.Format(), []byte(blobType))
-		assert.Equal(t, b.Serialize(), []byte{})
+		b := objects.NewBlob("")
+		assert.Equal(t, b.Format(), blobType)
+		assert.Equal(t, b.Data, "")
 	})
 }
 
 func TestCustomtObject(t *testing.T) {
 	t.Run("DataObject", func(t *testing.T) {
 		data := "HelloThisIsATest"
-		b := objects.NewBlob([]byte(data))
-		assert.Equal(t, b.Serialize(), []byte(data))
+		b := objects.NewBlob(data)
+		assert.Equal(t, b.Data, data)
+	})
+}
+
+func TestObjectSerialize(t *testing.T) {
+	t.Run("Serialize", func(t *testing.T) {
+		data := "HelloThisIsATest"
+		b := objects.NewBlob(data)
+		assert.Equal(t, b.Serialize(), "blob 16\x00HelloThisIsATest")
+	})
+}
+
+func TestObjectDeseialize(t *testing.T) {
+	t.Run("Deseialize", func(t *testing.T) {
+		b := objects.NewBlob("")
+		err := b.Deserialize("blob 16\x00HelloThisIsATest")
+		assert.NoError(t, err)
+		assert.Equal(t, b.Data, "HelloThisIsATest")
+	})
+}
+
+func TestObjectHash(t *testing.T) {
+	t.Run("Hash", func(t *testing.T) {
+		data := "HelloThisIsATest"
+		b := objects.NewBlob(data)
+		_, err := b.Hash()
+		assert.NoError(t, err)
 	})
 }

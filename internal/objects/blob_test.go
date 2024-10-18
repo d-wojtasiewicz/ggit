@@ -11,16 +11,16 @@ const blobType = "blob"
 
 func TestDefaultBlob(t *testing.T) {
 	t.Run("DefaultBlob", func(t *testing.T) {
-		b := objects.NewBlob([]byte{})
-		assert.Equal(t, b.Format(), []byte(blobType))
-		assert.Equal(t, b.Serialize(), []byte{})
+		b := objects.NewBlob("")
+		assert.Equal(t, b.Format(), blobType)
+		assert.Equal(t, b.Data, "")
 	})
 }
 
 func TestCustomtBlob(t *testing.T) {
 	t.Run("DataBlob", func(t *testing.T) {
 		data := "HelloThisIsATest"
-		b := objects.NewBlob([]byte(data))
-		assert.Equal(t, b.Serialize(), []byte(data))
+		b := objects.NewBlob(data)
+		assert.Equal(t, b.Data, data)
 	})
 }
