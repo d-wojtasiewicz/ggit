@@ -2,6 +2,8 @@ package repository_test
 
 import (
 	"ggit/internal/factory"
+	"ggit/internal/filesystem"
+	"ggit/internal/objects"
 	"ggit/internal/repository"
 	"os"
 	"path/filepath"
@@ -62,7 +64,8 @@ func TestCreate(t *testing.T) {
 	r, err := repository.NewRepository(fs, cwd)
 	assert.NoError(t, err)
 
-	r.Create()
+	err = r.Create(false)
+	assert.NoError(t, err)
 
 	path := func(path []string) string {
 		return filepath.Join(append([]string{cwd, ".ggit"}, path...)...)
@@ -86,4 +89,65 @@ func TestCreate(t *testing.T) {
 			assert.True(t, found)
 		})
 	}
+}
+
+func TestWriteObject(t *testing.T) {
+	cwd := "./test/path"
+
+	fs := factory.NewTestFactory()
+	fs.MkdirAll(cwd, os.ModePerm)
+
+	r, err := repository.NewRepository(fs, cwd)
+	assert.NoError(t, err)
+
+	err = r.Create(false)
+	assert.NoError(t, err)
+
+	t.Run("WriteObject", func(t *testing.T) {
+		obj := objects.NewBlob("thisIsABlob")
+		sha, err := r.WriteObject(obj)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, sha)
+
+		objectPath := r.ObjectPath(sha)
+		path := filepath.Join(append([]string{r.Gitdir}, objectPath...)...)
+
+		assert.True(t, filesystem.Exists(r.FS, path))
+
+		stats, err := fs.Stat(path)
+		assert.NoError(t, err)
+		assert.NotEqual(t, stats.Size(), 0)
+	})
+}
+
+func TestReadObject(t *testing.T) {
+	cwd := "./test/path"
+
+	fs := factory.NewTestFactory()
+	fs.MkdirAll(cwd, os.ModePerm)
+
+	r, err := repository.NewRepository(fs, cwd)
+	assert.NoError(t, err)
+
+	err = r.Create(false)
+	assert.NoError(t, err)
+
+	data := "thisIsABlob"
+	obj := objects.NewBlob(data)
+	sha, err := r.WriteObject(obj)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, sha)
+
+	t.Run("ReadObject", func(t *testing.T) {
+		obj, err := r.ReadObject(sha)
+		assert.NoError(t, err)
+		assert.NotNil(t, obj)
+		blob := obj.(*objects.Blob)
+		assert.Equal(t, blob.Data, data)
+
+		objectPath := r.ObjectPath(sha)
+		path := filepath.Join(append([]string{r.Gitdir}, objectPath...)...)
+
+		assert.True(t, filesystem.Exists(r.FS, path))
+	})
 }

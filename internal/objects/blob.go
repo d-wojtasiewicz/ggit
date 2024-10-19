@@ -1,12 +1,15 @@
 package objects
 
 type Blob struct {
-	object
+	*object
 }
 
 func NewBlob(data string) *Blob {
-	b := Blob{}
-	b.format = "blob"
-	b.Data = data
-	return &b
+	b := &Blob{
+		object: &object{
+			format: "blob",
+			Data:   data,
+		},
+	}
+	return b
 }

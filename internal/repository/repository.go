@@ -243,13 +243,11 @@ func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
 		return nil, err
 	}
 
-	str := string(decompressedData)
+	x := strings.Index(decompressedData, " ")
+	format := decompressedData[0:x]
 
-	x := strings.Index(str, " ")
-	format := str[0:x]
-
-	y := strings.Index(str, "\x00")
-	size, err := strconv.Atoi(str[x:y])
+	y := strings.Index(decompressedData, "\x00")
+	size, err := strconv.Atoi(decompressedData[x+1 : y])
 	if err != nil {
 		return nil, fmt.Errorf("unable to read object size")
 	}
@@ -260,7 +258,7 @@ func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
 
 	switch format {
 	case "blob":
-		return objects.NewBlob(str[y+1:]), nil
+		return objects.NewBlob(decompressedData[y+1:]), nil
 	default:
 		return nil, fmt.Errorf("unknown type %s for object %s", format, sha)
 	}

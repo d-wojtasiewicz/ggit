@@ -63,7 +63,8 @@ func ReadFileData(fs factory.FS, path ...string) (string, error) {
 	if !Exists(fs, filepath) {
 		return "", fmt.Errorf("file not found")
 	}
-	buf := bytes.NewBuffer(nil)
+	buffer := make([]byte, 1024)
+	buf := bytes.NewBuffer(buffer)
 	f, _ := fs.Open(filepath)
 	_, err := f.Read(buf.Bytes())
 	if err != nil {
