@@ -165,34 +165,34 @@ func (r *Repository) defaultHeadFile() (bool, error) {
 //
 // Returns:
 //   - An error if any of the directory creations or file writes fail.
-func (r *Repository) Create(saveConfig bool) error {
+func (r *Repository) Create(saveConfig bool) (string, error) {
 	msg := fmt.Sprintf("Initialized empty GGit repository in %s", r.Gitdir)
 	reinitMsg := fmt.Sprintf("Reinitialized existing GGit repository in %s", r.Gitdir)
 	_, err := r.MakeDir("branches")
 	if err != nil {
-		return err
+		return "", err
 	}
 	_, err = r.MakeDir("objects")
 	if err != nil {
-		return err
+		return "", err
 	}
 	_, err = r.MakeDir("refs", "tags")
 	if err != nil {
-		return err
+		return "", err
 	}
 	_, err = r.MakeDir("refs", "heads")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	found0, err := r.defaultDescription()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	found1, err := r.defaultHeadFile()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if found0 || found1 {
@@ -202,10 +202,9 @@ func (r *Repository) Create(saveConfig bool) error {
 	c := NewConfig(r.Gitdir, r.FS)
 	c.Save = saveConfig
 	if err := c.DefaultConfig(); err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println(msg)
-	return nil
+	return msg, err
 }
 
 func (r *Repository) ObjectPath(sha string) []string {

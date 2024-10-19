@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"fmt"
 	"ggit/internal/factory"
 	"ggit/internal/filesystem"
 	"ggit/internal/objects"
@@ -64,8 +65,11 @@ func TestCreate(t *testing.T) {
 	r, err := repository.NewRepository(fs, cwd)
 	assert.NoError(t, err)
 
-	err = r.Create(false)
+	msg := fmt.Sprintf("Initialized empty GGit repository in %s", filepath.Join(cwd, ".ggit"))
+
+	output, err := r.Create(false)
 	assert.NoError(t, err)
+	assert.Equal(t, msg, output)
 
 	path := func(path []string) string {
 		return filepath.Join(append([]string{cwd, ".ggit"}, path...)...)
@@ -100,7 +104,7 @@ func TestWriteObject(t *testing.T) {
 	r, err := repository.NewRepository(fs, cwd)
 	assert.NoError(t, err)
 
-	err = r.Create(false)
+	_, err = r.Create(false)
 	assert.NoError(t, err)
 
 	t.Run("WriteObject", func(t *testing.T) {
@@ -128,8 +132,7 @@ func TestReadObject(t *testing.T) {
 
 	r, err := repository.NewRepository(fs, cwd)
 	assert.NoError(t, err)
-
-	err = r.Create(false)
+	_, err = r.Create(false)
 	assert.NoError(t, err)
 
 	data := "thisIsABlob"
