@@ -13,7 +13,7 @@ func NewCommandInit(r *repository.Repository) *cobra.Command {
 		Long: `This command creates an empty Git repository - basically a .git directory with subdirectories for objects, refs/heads, refs/tags, and template files. 
 	An initial branch without any commits will be created (see the --initial-branch option below for its name).`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			return r.Create()
+			return r.Create(true)
 		},
 	}
 	return cmd

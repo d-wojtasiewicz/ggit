@@ -105,14 +105,14 @@ func (r *Repository) WriteTextToFile(data string, path ...string) error {
 	return filesystem.WriteStringToFile(r.FS, data, r.path(path...))
 }
 
-// WriteBytesToFile compresses they byte data and writes the specified data
+// WriteCompressedToFile compresses the data and writes the specified data
 // to a file at the given path, which is relative to the repository's Git directory.
 // The method ensures that the necessary directory structure exists.
 //
 // Returns:
 //   - An error if writing to the file fails.
-func (r *Repository) WriteBytesToFile(data string, path ...string) error {
-	r.MakeDir(path[0 : len(path)-1]...)
+func (r *Repository) WriteCompressedToFile(data string, path ...string) error {
+	r.MakeDir(path...)
 	compressed, err := util.Compress(data)
 	if err != nil {
 		return err
@@ -165,7 +165,7 @@ func (r *Repository) defaultHeadFile() (bool, error) {
 //
 // Returns:
 //   - An error if any of the directory creations or file writes fail.
-func (r *Repository) Create() error {
+func (r *Repository) Create(saveConfig bool) error {
 	msg := fmt.Sprintf("Initialized empty GGit repository in %s", r.Gitdir)
 	reinitMsg := fmt.Sprintf("Reinitialized existing GGit repository in %s", r.Gitdir)
 	_, err := r.MakeDir("branches")
@@ -200,6 +200,7 @@ func (r *Repository) Create() error {
 	}
 
 	c := NewConfig(r.Gitdir, r.FS)
+	c.Save = saveConfig
 	if err := c.DefaultConfig(); err != nil {
 		return err
 	}
@@ -207,19 +208,32 @@ func (r *Repository) Create() error {
 	return nil
 }
 
-func (r *Repository) WriteObject(o objects.GitObject) error {
+func (r *Repository) ObjectPath(sha string) []string {
+	return []string{"objects", sha[0:2], sha[2:]}
+}
+
+func (r *Repository) WriteObject(o objects.GitObject) (string, error) {
 	data := o.Serialize()
-	path := r.path(data[0:2], data[2:])
-	return r.WriteBytesToFile(data, path)
+	hash, err := o.Hash()
+	if err != nil {
+		return "", nil
+	}
+	path := r.ObjectPath(hash)
+	err = r.WriteCompressedToFile(data, path...)
+	if err != nil {
+		return "", nil
+	}
+	return o.Hash()
 }
 
 func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
-	path := r.path("objects", sha[0:2], sha[2:])
-	if !filesystem.Exists(r.FS, path) {
+	path := r.ObjectPath(sha)
+	repoPath := r.path(path...)
+	if !filesystem.Exists(r.FS, repoPath) {
 		return nil, fmt.Errorf("object not found")
 	}
 
-	data, err := filesystem.ReadFileData(r.FS, path)
+	data, err := filesystem.ReadFileData(r.FS, repoPath)
 	if err != nil {
 		return nil, err
 	}

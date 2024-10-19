@@ -21,9 +21,8 @@ import (
 //
 // Returns:
 //   - An error if there is an issue opening the file, writing the data, or syncing the file.
-func WriteStringToFile(fs factory.FS, data string, path ...string) error {
-	file_path := filepath.Join(path...)
-	f, err := fs.OpenFile(file_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func WriteStringToFile(fs factory.FS, data string, path string) error {
+	f, err := fs.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -36,9 +35,8 @@ func WriteStringToFile(fs factory.FS, data string, path ...string) error {
 	return nil
 }
 
-func WriteBytesToFile(fs factory.FS, data []byte, path ...string) error {
-	file_path := filepath.Join(path...)
-	f, err := fs.OpenFile(file_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func WriteBytesToFile(fs factory.FS, data []byte, path string) error {
+	f, err := fs.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
