@@ -146,7 +146,7 @@ func TestReadObject(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, obj)
 		blob := obj.(*objects.Blob)
-		assert.Equal(t, blob.Data, data)
+		assert.Equal(t, blob.ReadData(), data)
 
 		objectPath := r.ObjectPath(sha)
 		path := filepath.Join(append([]string{r.Gitdir}, objectPath...)...)

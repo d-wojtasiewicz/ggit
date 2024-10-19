@@ -25,6 +25,10 @@ type Repository struct {
 	FS       factory.FS
 }
 
+func GitObjects() []string {
+	return []string{"blob"}
+}
+
 // NewRepository creates and initializes a new repository instance.
 // It attempts to determine the current working directory and sets it
 // as the worktree for the repository. The Git directory is then constructed
@@ -261,4 +265,13 @@ func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
 	default:
 		return nil, fmt.Errorf("unknown type %s for object %s", format, sha)
 	}
+}
+
+func (r *Repository) CatObject(sha string) (string, error) {
+	obj, err := r.ReadObject(sha)
+	if err != nil {
+		return "", err
+	}
+
+	return obj.ReadData(), nil
 }

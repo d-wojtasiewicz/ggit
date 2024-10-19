@@ -13,18 +13,20 @@ type GitObject interface {
 	Deserialize(data string) error
 	Format() string
 	Hash() (string, error)
+	ReadData() string
+	SetData(string)
 }
 
 type object struct {
 	format string
-	Data   string
+	data   string
 }
 
-func (b *object) Serialize() string {
-	return fmt.Sprintf("%v %v%v%v", b.format, len(b.Data), "\x00", b.Data)
+func (o *object) Serialize() string {
+	return fmt.Sprintf("%v %v%v%v", o.format, len(o.data), "\x00", o.data)
 }
 
-func (b *object) Deserialize(data string) error {
+func (o *object) Deserialize(data string) error {
 	x := strings.Index(data, " ")
 	format := data[0:x]
 
@@ -37,13 +39,21 @@ func (b *object) Deserialize(data string) error {
 	if size != len(data)-y-1 {
 		return fmt.Errorf("malformed object %s: bad length", data)
 	}
-	b.format = format
-	b.Data = data[y+1:]
+	o.format = format
+	o.data = data[y+1:]
 	return nil
 }
 
 func (b *object) Format() string {
 	return b.format
+}
+
+func (o *object) SetData(data string) {
+	o.data = data
+}
+
+func (o *object) ReadData() string {
+	return o.data
 }
 
 func (o *object) Hash() (string, error) {

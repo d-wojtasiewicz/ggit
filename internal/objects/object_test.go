@@ -11,7 +11,7 @@ func TestDefaultObject(t *testing.T) {
 	t.Run("DefaultObject", func(t *testing.T) {
 		b := objects.NewBlob("")
 		assert.Equal(t, b.Format(), blobType)
-		assert.Equal(t, b.Data, "")
+		assert.Equal(t, b.ReadData(), "")
 	})
 }
 
@@ -19,7 +19,7 @@ func TestCustomtObject(t *testing.T) {
 	t.Run("DataObject", func(t *testing.T) {
 		data := "HelloThisIsATest"
 		b := objects.NewBlob(data)
-		assert.Equal(t, b.Data, data)
+		assert.Equal(t, b.ReadData(), data)
 	})
 }
 
@@ -36,7 +36,7 @@ func TestObjectDeseialize(t *testing.T) {
 		b := objects.NewBlob("")
 		err := b.Deserialize("blob 16\x00HelloThisIsATest")
 		assert.NoError(t, err)
-		assert.Equal(t, b.Data, "HelloThisIsATest")
+		assert.Equal(t, b.ReadData(), "HelloThisIsATest")
 	})
 }
 
