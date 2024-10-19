@@ -154,3 +154,20 @@ func TestReadObject(t *testing.T) {
 		assert.True(t, filesystem.Exists(r.FS, path))
 	})
 }
+
+func TestCatFile(t *testing.T) {
+	cwd := "./test/path"
+
+	fs := factory.NewTestFactory()
+	fs.MkdirAll(cwd, os.ModePerm)
+
+	r, _ := repository.NewRepository(fs, cwd)
+	_, _ = r.Create(false)
+
+	data := "thisIsABlob"
+	obj := objects.NewBlob(data)
+	hash, _ := r.WriteObject(obj)
+	out, err := r.CatObject(hash)
+	assert.NoError(t, err)
+	assert.Equal(t, out, data)
+}
