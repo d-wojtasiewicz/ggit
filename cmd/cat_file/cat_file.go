@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCommandInit(r *repository.Repository) *cobra.Command {
+func NewCommandCatFile(r *repository.Repository) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "init",
+		Use:   "cat-file",
 		Short: "Provide contents or details of repository objects",
 		Long:  "Provide contents or details of repository objects",
 		Args:  cobra.ExactArgs(2),
