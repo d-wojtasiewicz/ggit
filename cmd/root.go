@@ -5,8 +5,8 @@ package cmd
 
 import (
 	"fmt"
-	"ggit/cmd/cat_file"
-	"ggit/cmd/repoInit"
+	catfile "ggit/cmd/cat_file"
+	repoinit "ggit/cmd/repo_init"
 	"ggit/internal/factory"
 	"ggit/internal/filesystem"
 	"ggit/internal/repository"
@@ -45,6 +45,6 @@ func init() {
 		fmt.Printf("%e", err)
 		os.Exit(1)
 	}
-	rootCmd.AddCommand(repoInit.NewCommandInit(r))
-	rootCmd.AddCommand(cat_file.NewCommandInit(r))
+	rootCmd.AddCommand(repoinit.NewCommandInit(r))
+	rootCmd.AddCommand(catfile.NewCommandInit(r))
 }

@@ -1,4 +1,4 @@
-package cat_file
+package catfile
 
 import (
 	"fmt"

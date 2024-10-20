@@ -1,4 +1,4 @@
-package repoInit
+package repoinit
 
 import (
 	"fmt"
