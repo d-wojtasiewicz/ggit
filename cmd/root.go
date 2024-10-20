@@ -46,5 +46,5 @@ func init() {
 		os.Exit(1)
 	}
 	rootCmd.AddCommand(repoinit.NewCommandInit(r))
-	rootCmd.AddCommand(catfile.NewCommandInit(r))
+	rootCmd.AddCommand(catfile.NewCommandCatFile(r))
 }

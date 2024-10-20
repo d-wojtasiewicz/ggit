@@ -267,11 +267,6 @@ func (r *Repository) ReadObject(sha string) (objects.GitObject, error) {
 	}
 }
 
-func (r *Repository) CatObject(sha string) (string, error) {
-	obj, err := r.ReadObject(sha)
-	if err != nil {
-		return "", err
-	}
-
-	return obj.ReadData(), nil
+func (r *Repository) IsInitiated() bool {
+	return filesystem.Exists(r.FS, r.Gitdir)
 }
