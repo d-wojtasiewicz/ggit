@@ -1,7 +1,7 @@
-package kvlm_test
+package objects_test
 
 import (
-	"ggit/internal/kvlm"
+	"ggit/internal/objects"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +47,7 @@ Q52UWybBzpaP9HEd4XnR+HuQ4k2K0ns2KgNImsNvIyFwbpMUyUWLMPimaV1DWUXo
 -----END PGP SIGNATURE-----`
 
 	t.Run("KVLM deserialise", func(t *testing.T) {
-		var kvlm kvlm.KWLM
+		var kvlm objects.KWLM
 		kvlm.Deserialize(validMessage)
 		assert.Equal(t, "29ff16c9c14e2652b22f8b78bb08a5a07930c147", kvlm.Tree)
 		assert.Equal(t, "206941306e8a8af65b66eaaaea388a7ae24d49a0", kvlm.Parent)
@@ -58,7 +58,7 @@ Q52UWybBzpaP9HEd4XnR+HuQ4k2K0ns2KgNImsNvIyFwbpMUyUWLMPimaV1DWUXo
 
 	})
 	t.Run("KVLM serialise", func(t *testing.T) {
-		var kvlm kvlm.KWLM
+		var kvlm objects.KWLM
 		kvlm.Deserialize(validMessage)
 		assert.Equal(t, validMessage, kvlm.Serialize())
 	})

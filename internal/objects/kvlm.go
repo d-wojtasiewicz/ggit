@@ -1,4 +1,4 @@
-package kvlm
+package objects
 
 import (
 	"fmt"
