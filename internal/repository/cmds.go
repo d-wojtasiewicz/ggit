@@ -12,7 +12,7 @@ func (r *Repository) CatObject(sha string) (string, error) {
 		return "", err
 	}
 
-	return obj.ReadData(), nil
+	return obj.(*objects.Blob).ReadData(), nil
 }
 
 type HashObject struct {
