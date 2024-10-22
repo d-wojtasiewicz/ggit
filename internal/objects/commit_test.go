@@ -47,19 +47,19 @@ Q52UWybBzpaP9HEd4XnR+HuQ4k2K0ns2KgNImsNvIyFwbpMUyUWLMPimaV1DWUXo
 -----END PGP SIGNATURE-----`
 
 	t.Run("KVLM deserialise", func(t *testing.T) {
-		var kvlm objects.KWLM
-		kvlm.Deserialize(validMessage)
-		assert.Equal(t, "29ff16c9c14e2652b22f8b78bb08a5a07930c147", kvlm.Tree)
-		assert.Equal(t, "206941306e8a8af65b66eaaaea388a7ae24d49a0", kvlm.Parent)
-		assert.Equal(t, "Neil Gaiman <cat@gaiman.net> 1527025023 +0200", kvlm.Author)
-		assert.Equal(t, "Neil Gaiman <cat@gaiman.net> 1527025044 +0200", kvlm.Comitter)
-		assert.Equal(t, key, kvlm.GPGSIG)
-		assert.Equal(t, "Create first draft", kvlm.Message)
+		c := objects.NewCommit()
+		c.Deserialize(validMessage)
+		assert.Equal(t, "29ff16c9c14e2652b22f8b78bb08a5a07930c147", c.KVLM.Tree)
+		assert.Equal(t, "206941306e8a8af65b66eaaaea388a7ae24d49a0", c.KVLM.Parent)
+		assert.Equal(t, "Neil Gaiman <cat@gaiman.net> 1527025023 +0200", c.KVLM.Author)
+		assert.Equal(t, "Neil Gaiman <cat@gaiman.net> 1527025044 +0200", c.KVLM.Comitter)
+		assert.Equal(t, key, c.KVLM.GPGSIG)
+		assert.Equal(t, "Create first draft", c.KVLM.Message)
 
 	})
 	t.Run("KVLM serialise", func(t *testing.T) {
-		var kvlm objects.KWLM
-		kvlm.Deserialize(validMessage)
-		assert.Equal(t, validMessage, kvlm.Serialize())
+		c := objects.NewCommit()
+		c.Deserialize(validMessage)
+		assert.Equal(t, validMessage, c.Serialize())
 	})
 }

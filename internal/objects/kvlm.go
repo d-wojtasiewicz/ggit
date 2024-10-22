@@ -6,7 +6,7 @@ import (
 )
 
 // Key-Value List with Message
-type KWLM struct {
+type kvlm struct {
 	Tree     string
 	Parent   string
 	Author   string
@@ -19,7 +19,7 @@ func validKeys() []string {
 	return []string{"tree", "parent", "author", "committer", "gpgsig"}
 }
 
-func (k *KWLM) Deserialize(data string) {
+func (k *kvlm) Deserialize(data string) {
 	for data != "" {
 		space := strings.Index(data, " ")
 		newLine := strings.Index(data, "\n")
@@ -59,7 +59,7 @@ func (k *KWLM) Deserialize(data string) {
 	}
 }
 
-func (k *KWLM) Serialize() string {
+func (k *kvlm) Serialize() string {
 	value := fmt.Sprintf("%s %s\n", "tree", k.Tree)
 	value = value + fmt.Sprintf("%s %s\n", "parent", k.Parent)
 	value = value + fmt.Sprintf("%s %s\n", "author", k.Author)
